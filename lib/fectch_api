@@ -1,0 +1,174 @@
+import 'dart:async';
+import 'dart:convert';
+import 'package:calling_api/data/article.dart';
+import 'package:http/http.dart' as http;
+import 'package:cached_network_image/cached_network_image.dart';
+
+import 'package:flutter/material.dart';
+// api key: 724c976df9074928a7c346fbd6c7f438
+
+class News {
+  final List<Object> articles;
+  final String status;
+  final int totalResults;
+  News({
+    @required this.articles,
+    @required this.status,
+    @required this.totalResults,
+  });
+
+  // factory is a constructor
+  factory News.fromJson(Map<String, dynamic> json) {
+    // json co kieu du lieu Map<String, dynamic>, voi String la kieu du lieu
+    // cho cac keys va dynamic la kieu du lieu cua value cua cac keys do
+    print('json: $json');
+    return News(
+        status: json['status'],
+        articles: json['articles'],
+        totalResults: json["totalResults"]);
+  }
+}
+
+void main() => runApp(MyApp());
+
+class MyApp extends StatefulWidget {
+  MyApp({Key key}) : super(key: key);
+
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  Future<News> futureNews;
+  List<Article> news;
+  Future<News> fetchNews() async {
+    String url =
+        "https://newsapi.org/v2/top-headlines?sources=techcrunch&apiKey=724c976df9074928a7c346fbd6c7f438";
+    final response = await http.get(Uri.parse(url));
+
+    print('${Uri.parse(url)}');
+    print('${response.statusCode}');
+    if (response.statusCode == 200) {
+      // If the server did return a 200 OK response,
+      // then parse the JSON.
+//    print('${response.toString()}');
+//    print('${response.body}');
+//    print('"response.body: "${jsonDecode(response.body)}');
+      return News.fromJson(jsonDecode(response.body));
+    } else {
+      // If the server did not return a 200 OK response,
+      // then throw an exception.
+      throw Exception('Failed to load album');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    futureNews = fetchNews();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Fetch Data Example',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('Fetch Data Example'),
+        ),
+        body: Center(
+          child: FutureBuilder<News>(
+            future: futureNews,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                print("$snapshot");
+                print("${snapshot.data.toString()}");
+                List<Article> news = [];
+                // Tao tung doi tuong article roi add vao news
+                snapshot.data.articles.forEach((element) {
+                  Map newElement = element;
+                  if (newElement["urlToImage"] != null &&
+                      newElement["description"] != null) {
+                    // tao doi tuong(instance) Article
+                    Article article = new Article(
+                        author: newElement["author"],
+                        title: newElement["title"],
+                        desc: newElement["description"],
+                        imgSrc: newElement["urlToImage"],
+//                        publishedAt: newElement["publishedAt"] as DateTime,
+                        content: newElement["content"]);
+                    // Them article vao news
+                    print("imgSrc: ${article.imgSrc}");
+                    news.add(article);
+                  }
+                });
+                dynamic articlesLength = snapshot.data.totalResults;
+                return Articles(news: news);
+              } else if (snapshot.hasError) {
+                return Text("${snapshot.error}");
+              }
+              // By default, show a loading spinner.
+              return CircularProgressIndicator();
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class Articles extends StatelessWidget {
+  const Articles({
+    Key key,
+    @required this.news,
+  }) : super(key: key);
+
+  final List<Article> news;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 20),
+      child: ListView.builder(
+          itemCount: news.length,
+          itemBuilder: (context, index) {
+            print('article: ${news[index]}');
+            return SingleArticle(
+              title: news[index].title,
+              imgUrl: news[index].imgSrc,
+            );
+          }),
+    );
+  }
+}
+
+class SingleArticle extends StatelessWidget {
+  final String title;
+  final String imgUrl;
+  const SingleArticle({
+    Key key,
+    @required this.imgUrl,
+    this.title,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 10),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(title),
+          CachedNetworkImage(
+            imageUrl: imgUrl,
+            placeholder: (context, url) => CircularProgressIndicator(),
+            errorWidget: (context, url, error) => Icon(Icons.error),
+          ),
+        ],
+      ),
+    );
+  }
+}
