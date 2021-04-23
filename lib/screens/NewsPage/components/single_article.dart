@@ -4,28 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 class SingleArticle extends StatelessWidget {
-  final String title;
-  final String imgUrl;
-  final String desc;
-  final String pulishedAt;
-  final String content;
+  final Article article;
   const SingleArticle({
     Key key,
-    @required this.imgUrl,
-    this.title,
-    this.desc,
-    this.pulishedAt,
-    this.content,
+    this.article,
   }) : super(key: key);
   navigateToDetailScreen(context) {
+    print('tojson: ${article.toJson()}');
     Navigator.pushNamed(context, DetailScreen.routeName,
-        arguments: Article(
-            title: title,
-            imgSrc: imgUrl,
-            desc: desc,
-            publishedAt: pulishedAt,
-            author: null,
-            content: content));
+        arguments: Article.fromJson(article.toJson()));
   }
 
   @override
@@ -40,7 +27,7 @@ class SingleArticle extends StatelessWidget {
           // TITLE
           GestureDetector(
             child: Text(
-              title,
+              article.title,
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
             ),
             onTap: () {
@@ -53,7 +40,7 @@ class SingleArticle extends StatelessWidget {
             height: size.height * 0.01,
           ),
           // Published At
-          Text("$pulishedAt"),
+          Text("${article.publishedAt}"),
           SizedBox(
             height: size.height * 0.02,
           ),
@@ -66,7 +53,7 @@ class SingleArticle extends StatelessWidget {
                 highlightColor: Colors.pinkAccent.withOpacity(0.5),
                 splashColor: Colors.indigo,
                 child: CachedNetworkImage(
-                  imageUrl: imgUrl,
+                  imageUrl: article.imgSrc,
                   placeholder: (context, url) => CircularProgressIndicator(),
                   errorWidget: (context, url, error) => Icon(Icons.error),
                 ),
@@ -81,7 +68,7 @@ class SingleArticle extends StatelessWidget {
           ),
 
           // Description
-          Text(desc, style: TextStyle(color: Colors.black54))
+          Text(article.desc, style: TextStyle(color: Colors.black54))
         ],
       ),
     );

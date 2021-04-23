@@ -1,18 +1,13 @@
+import 'package:calling_api/dataclasses/article.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 class DetailScreen extends StatelessWidget {
   static const routeName = '/detailScreen';
-  final String title;
-  final String imgUrl;
-  final String content;
-  final String pulishedAt;
+  final Article article;
   const DetailScreen({
     Key key,
-    @required this.imgUrl,
-    this.title,
-    this.content,
-    this.pulishedAt,
+    this.article,
   }) : super(key: key);
 
   @override
@@ -33,26 +28,26 @@ class DetailScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                title,
+                article.title,
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
               ),
               // Use CachedNetworkImage
               SizedBox(
                 height: size.height * 0.01,
               ),
-              Text("$pulishedAt"),
+              Text("${article.publishedAt}"),
               SizedBox(
                 height: size.height * 0.02,
               ),
               ClipRRect(
                 borderRadius: BorderRadius.circular(6),
                 child: CachedNetworkImage(
-                  imageUrl: imgUrl,
+                  imageUrl: article.imgSrc,
                   placeholder: (context, url) => CircularProgressIndicator(),
                   errorWidget: (context, url, error) => Icon(Icons.error),
                 ),
               ),
-              Text(content)
+              Text(article.content)
             ],
           ),
         ),

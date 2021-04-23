@@ -22,12 +22,9 @@ class Articles extends StatelessWidget {
           itemCount: news.length,
           itemBuilder: (context, index) {
             print('article: ${news[index]}');
+
             return SingleArticle(
-              title: news[index].title,
-              imgUrl: news[index].imgSrc,
-              desc: news[index].desc,
-              pulishedAt: news[index].publishedAt,
-              content: news[index].content,
+              article: news[index],
             );
           }),
     );

@@ -1,6 +1,5 @@
 import 'package:calling_api/screens/DetailPage/detail_screen.dart';
 import 'package:calling_api/screens/NewsPage/news_screen.dart';
-
 import 'package:flutter/material.dart';
 
 import 'dataclasses/article.dart';
@@ -17,11 +16,11 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  List<Article> news = new List<Article>();
+  List<Article> news = [];
+//  Future<List<Article>> articles;
   @override
   void initState() {
     super.initState();
-
     this.getNews();
   }
 
@@ -50,10 +49,7 @@ class _MyAppState extends State<MyApp> {
             return MaterialPageRoute(
                 settings: RouteSettings(name: DetailScreen.routeName),
                 builder: (context) => DetailScreen(
-                      title: args.title,
-                      imgUrl: args.imgSrc,
-                      content: args.content,
-                      pulishedAt: args.publishedAt,
+                      article: args,
                     ));
           default:
             return MaterialPageRoute(

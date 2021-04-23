@@ -5,12 +5,27 @@ class Article {
   final String imgSrc;
   final String publishedAt;
   final String content;
-  Article({
+  Article(
     this.author,
     this.title,
     this.desc,
     this.imgSrc,
     this.publishedAt,
     this.content,
-  });
+  );
+  Article.fromJson(Map<String, dynamic> json)
+      : author = json['author'],
+        title = json['title'],
+        desc = json['description'],
+        imgSrc = json['urlToImage'],
+        publishedAt = json['publishedAt'],
+        content = json['content'];
+  Map<String, dynamic> toJson() => {
+        'author': author,
+        'title': title,
+        'description': desc,
+        'urlToImage': imgSrc,
+        'publishedAt': publishedAt,
+        'content': content,
+      };
 }
